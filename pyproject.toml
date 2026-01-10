@@ -1,0 +1,47 @@
+[tool.ruff]
+# Set line length to 100
+line-length = 100
+
+# Target Python 3.13
+target-version = "py313"
+
+# Exclude common directories
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+# Enable pycodestyle (E, W), pyflakes (F), isort (I), and other useful rules
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "N",     # pep8-naming
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "SIM",   # flake8-simplify
+]
+
+# Ignore specific rules if needed
+ignore = [
+    "SIM117",  # Allow nested with statements for clarity
+    "E501",    # Allow lines longer than 100 chars in specific cases
+    "B023",    # Loop variables in nested functions are correctly scoped here
+]
+
+[tool.ruff.lint.isort]
+# Configure import sorting
+known-first-party = ["foodb"]
+
+[tool.ruff.format]
+# Use double quotes by default
+quote-style = "double"
+
+# Indent with spaces
+indent-style = "space"
