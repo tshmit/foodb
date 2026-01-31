@@ -30,20 +30,63 @@ CREATE TABLE usda.branded_food (
 	trade_channel STRING NULL,
 	short_description STRING NULL,
 	material_code STRING NULL,
-	CONSTRAINT branded_food_pkey PRIMARY KEY (fdc_id ASC)
+	CONSTRAINT branded_food_pkey PRIMARY KEY (fdc_id ASC),
+	INDEX branded_food_gtin_upc_idx (gtin_upc ASC)
+);
+
+--
+-- usda.fndds_derivation
+--
+CREATE TABLE usda.fndds_derivation (
+	derivation_code STRING NULL,
+	derivation_description STRING NULL,
+	rowid INT8 NOT VISIBLE NOT NULL DEFAULT unique_rowid(),
+	CONSTRAINT fndds_derivation_pkey PRIMARY KEY (rowid ASC)
+);
+
+--
+-- usda.fndds_ingredient_nutrient_value
+--
+CREATE TABLE usda.fndds_ingredient_nutrient_value (
+	ingredient_code STRING NULL,
+	ingredient_description STRING NULL,
+	nutrient_code STRING NULL,
+	nutrient_value FLOAT8 NULL,
+	nutrient_value_source STRING NULL,
+	fdc_id INT8 NULL,
+	derivation_code STRING NULL,
+	sr_addmod_year INT8 NULL,
+	foundation_year_acquired STRING NULL,
+	start_date DATE NULL,
+	end_date DATE NULL,
+	rowid INT8 NOT VISIBLE NOT NULL DEFAULT unique_rowid(),
+	CONSTRAINT fndds_ingredient_nutrient_value_pkey PRIMARY KEY (rowid ASC)
 );
 
 --
 -- usda.food
 --
 CREATE TABLE usda.food (
-	fdc_id INT8 NULL,
+	fdc_id INT8 NOT NULL,
 	data_type STRING NULL,
 	description STRING NULL,
 	food_category_id STRING NULL,
 	publication_date DATE NULL,
 	rowid INT8 NOT VISIBLE NOT NULL DEFAULT unique_rowid(),
-	CONSTRAINT food_pkey PRIMARY KEY (rowid ASC)
+	CONSTRAINT food_pkey PRIMARY KEY (rowid ASC),
+	INDEX food_fdc_id_idx (fdc_id ASC),
+	UNIQUE INDEX food_fdc_id_uidx (fdc_id ASC)
+);
+
+--
+-- usda.food_calorie_conversion_factor
+--
+CREATE TABLE usda.food_calorie_conversion_factor (
+	food_nutrient_conversion_factor_id INT8 NOT NULL,
+	protein_value FLOAT8 NULL,
+	fat_value FLOAT8 NULL,
+	carbohydrate_value FLOAT8 NULL,
+	CONSTRAINT food_calorie_conversion_factor_pkey PRIMARY KEY (food_nutrient_conversion_factor_id ASC)
 );
 
 --
@@ -54,4 +97,204 @@ CREATE TABLE usda.food_category (
 	code STRING NULL,
 	description STRING NULL,
 	CONSTRAINT food_category_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.food_component
+--
+CREATE TABLE usda.food_component (
+	id INT8 NOT NULL,
+	fdc_id INT8 NULL,
+	name STRING NULL,
+	pct_weight FLOAT8 NULL,
+	is_refuse STRING NULL,
+	gram_weight FLOAT8 NULL,
+	data_points INT8 NULL,
+	min_year_acquired INT8 NULL,
+	CONSTRAINT food_component_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.food_nutrient
+--
+CREATE TABLE usda.food_nutrient (
+	id INT8 NOT NULL,
+	fdc_id INT8 NULL,
+	nutrient_id INT8 NULL,
+	amount FLOAT8 NULL,
+	data_points INT8 NULL,
+	derivation_id INT8 NULL,
+	min FLOAT8 NULL,
+	max FLOAT8 NULL,
+	median FLOAT8 NULL,
+	loq FLOAT8 NULL,
+	footnote STRING NULL,
+	min_year_acquired INT8 NULL,
+	percent_daily_value FLOAT8 NULL,
+	CONSTRAINT food_nutrient_pkey PRIMARY KEY (id ASC),
+	INDEX food_nutrient_fdc_id_idx (fdc_id ASC)
+);
+
+--
+-- usda.food_nutrient_conversion_factor
+--
+CREATE TABLE usda.food_nutrient_conversion_factor (
+	id INT8 NOT NULL,
+	fdc_id INT8 NULL,
+	CONSTRAINT food_nutrient_conversion_factor_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.food_nutrient_derivation
+--
+CREATE TABLE usda.food_nutrient_derivation (
+	id INT8 NOT NULL,
+	code STRING NULL,
+	description STRING NULL,
+	CONSTRAINT food_nutrient_derivation_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.food_nutrient_source
+--
+CREATE TABLE usda.food_nutrient_source (
+	id INT8 NOT NULL,
+	code STRING NULL,
+	description STRING NULL,
+	CONSTRAINT food_nutrient_source_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.food_portion
+--
+CREATE TABLE usda.food_portion (
+	id INT8 NOT NULL,
+	fdc_id INT8 NULL,
+	seq_num INT8 NULL,
+	amount FLOAT8 NULL,
+	measure_unit_id INT8 NULL,
+	portion_description STRING NULL,
+	modifier STRING NULL,
+	gram_weight FLOAT8 NULL,
+	data_points INT8 NULL,
+	footnote STRING NULL,
+	min_year_acquired INT8 NULL,
+	CONSTRAINT food_portion_pkey PRIMARY KEY (id ASC),
+	INDEX food_portion_fdc_id_idx (fdc_id ASC)
+);
+
+--
+-- usda.food_protein_conversion_factor
+--
+CREATE TABLE usda.food_protein_conversion_factor (
+	food_nutrient_conversion_factor_id INT8 NOT NULL,
+	value FLOAT8 NULL,
+	CONSTRAINT food_protein_conversion_factor_pkey PRIMARY KEY (food_nutrient_conversion_factor_id ASC)
+);
+
+--
+-- usda.foundation_food
+--
+CREATE TABLE usda.foundation_food (
+	fdc_id INT8 NOT NULL,
+	ndb_number STRING NULL,
+	footnote STRING NULL,
+	CONSTRAINT foundation_food_pkey PRIMARY KEY (fdc_id ASC)
+);
+
+--
+-- usda.input_food
+--
+CREATE TABLE usda.input_food (
+	id INT8 NOT NULL,
+	fdc_id INT8 NULL,
+	fdc_id_of_input_food STRING NULL,
+	seq_num INT8 NULL,
+	amount FLOAT8 NULL,
+	sr_code STRING NULL,
+	sr_description STRING NULL,
+	unit STRING NULL,
+	portion_code STRING NULL,
+	portion_description STRING NULL,
+	gram_weight FLOAT8 NULL,
+	retention_code STRING NULL,
+	CONSTRAINT input_food_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.measure_unit
+--
+CREATE TABLE usda.measure_unit (
+	id INT8 NOT NULL,
+	name STRING NULL,
+	CONSTRAINT measure_unit_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.microbe
+--
+CREATE TABLE usda.microbe (
+	id INT8 NOT NULL,
+	foodid INT8 NULL,
+	method STRING NULL,
+	microbe_code STRING NULL,
+	min_value STRING NULL,
+	max_value STRING NULL,
+	uom STRING NULL,
+	CONSTRAINT microbe_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.nutrient
+--
+CREATE TABLE usda.nutrient (
+	id INT8 NOT NULL,
+	name STRING NULL,
+	unit_name STRING NULL,
+	nutrient_nbr FLOAT8 NULL,
+	rank FLOAT8 NULL,
+	CONSTRAINT nutrient_pkey PRIMARY KEY (id ASC)
+);
+
+--
+-- usda.retention_factor
+--
+CREATE TABLE usda.retention_factor (
+	n_gid STRING NULL,
+	n_code STRING NULL,
+	n_foodgroupid STRING NULL,
+	n_description STRING NULL,
+	rowid INT8 NOT VISIBLE NOT NULL DEFAULT unique_rowid(),
+	CONSTRAINT retention_factor_pkey PRIMARY KEY (rowid ASC)
+);
+
+--
+-- usda.sr_legacy_food
+--
+CREATE TABLE usda.sr_legacy_food (
+	fdc_id INT8 NOT NULL,
+	ndb_number STRING NULL,
+	CONSTRAINT sr_legacy_food_pkey PRIMARY KEY (fdc_id ASC)
+);
+
+--
+-- usda.survey_fndds_food
+--
+CREATE TABLE usda.survey_fndds_food (
+	fdc_id INT8 NOT NULL,
+	food_code STRING NULL,
+	wweia_category_code INT8 NULL,
+	start_date DATE NULL,
+	end_date DATE NULL,
+	CONSTRAINT survey_fndds_food_pkey PRIMARY KEY (fdc_id ASC)
+);
+
+--
+-- usda.wweia_food_category
+--
+CREATE TABLE usda.wweia_food_category (
+	wweia_food_category STRING NULL,
+	wweia_food_category_description STRING NULL,
+	rowid INT8 NOT VISIBLE NOT NULL DEFAULT unique_rowid(),
+	CONSTRAINT wweia_food_category_pkey PRIMARY KEY (rowid ASC)
 );
