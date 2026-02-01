@@ -215,6 +215,8 @@ __marimo__/
 *.pem
 certs/
 scratch/
+scratch.txt
+data/
 .DS_Store
 
 # External projects (experimental/third-party code)

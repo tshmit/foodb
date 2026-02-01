@@ -1,0 +1,1 @@
+"""Food database ingestion utilities."""
